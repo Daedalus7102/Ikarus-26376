@@ -18,7 +18,7 @@ public class Constants {
         public static RevHubOrientationOnRobot.LogoFacingDirection
                 logoFacingDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
         public static RevHubOrientationOnRobot.UsbFacingDirection
-                usbFacingDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
+                usbFacingDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
     }
 
     // Parameters for assigning controls for each action

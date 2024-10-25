@@ -20,8 +20,8 @@ public class TeleOperated extends OpMode {
     public void init() {
         chassisGamepad = new GamepadEx(gamepad1);
         mechanismsGamepad = new GamepadEx(gamepad2);
-        gyroscope = new Gyroscope();
-        drivetrain = new Drivetrain();
+        drivetrain = new Drivetrain(hardwareMap);
+        gyroscope = new Gyroscope(hardwareMap);
     }
 
     @Override
@@ -30,17 +30,17 @@ public class TeleOperated extends OpMode {
         if (chassisGamepad.getButton(Constants.Controls.resetHeading)) {
             gyroscope.resetHeading();
         }
-
+        
         // Drives the robot
         drivetrain.setSlowMode(chassisGamepad.getButton(Constants.Controls.activateSlowMode));
         if (chassisGamepad.getButton(Constants.Controls.activateTankMode)) {
             drivetrain.driveRobotOriented(chassisGamepad.getLeftX(),
                     chassisGamepad.getLeftY(),
-                    chassisGamepad.getRightY());
+                    chassisGamepad.getRightX());
         } else {
             drivetrain.driveFieldOriented(chassisGamepad.getLeftX(),
                     chassisGamepad.getLeftY(),
-                    chassisGamepad.getRightY(),
+                    chassisGamepad.getRightX(),
                     gyroscope.getHeading());
         }
 
