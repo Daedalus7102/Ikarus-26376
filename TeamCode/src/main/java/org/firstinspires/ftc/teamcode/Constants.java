@@ -14,6 +14,5 @@ public class Constants {
         public static GamepadKeys.Button resetHeading = GamepadKeys.Button.Y;
         public static GamepadKeys.Button activateTankMode = GamepadKeys.Button.LEFT_BUMPER;
         public static GamepadKeys.Button activateSlowMode = GamepadKeys.Button.RIGHT_BUMPER;
-
     }
 }
