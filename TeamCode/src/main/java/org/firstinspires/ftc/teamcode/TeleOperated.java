@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.Subsystems.Extender;
 import org.firstinspires.ftc.teamcode.Subsystems.Gyroscope;
+import org.firstinspires.ftc.teamcode.Subsystems.Arm;
 
 
 @TeleOp
@@ -14,6 +17,8 @@ public class TeleOperated extends OpMode {
     private GamepadEx mechanismsGamepad;
     private Gyroscope gyroscope;
     private Drivetrain drivetrain;
+    private Arm rotator;
+    private Extender extender;
 
 
     @Override
@@ -22,6 +27,8 @@ public class TeleOperated extends OpMode {
         mechanismsGamepad = new GamepadEx(gamepad2);
         drivetrain = new Drivetrain(hardwareMap);
         gyroscope = new Gyroscope(hardwareMap);
+        rotator = new Arm(hardwareMap);
+        extender = new Extender(hardwareMap);
     }
 
     @Override
@@ -29,6 +36,18 @@ public class TeleOperated extends OpMode {
         // Resets the field relative heading
         if (chassisGamepad.getButton(Constants.Controls.resetHeading)) {
             gyroscope.resetHeading();
+        }
+
+        if (chassisGamepad.getButton(GamepadKeys.Button.DPAD_UP)) {
+            rotator.setBasketAngle();
+        } else {
+            rotator.setBaseAngle();
+        }
+
+        if (chassisGamepad.getButton(GamepadKeys.Button.DPAD_RIGHT)) {
+            extender.test(100);
+        } else {
+            extender.test(0);
         }
         
         // Drives the robot
@@ -43,7 +62,5 @@ public class TeleOperated extends OpMode {
                     chassisGamepad.getRightX(),
                     gyroscope.getHeading());
         }
-
-        // Pending
     }
 }
