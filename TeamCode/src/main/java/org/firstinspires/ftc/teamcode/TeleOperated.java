@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.Subsystems.Extender;
 import org.firstinspires.ftc.teamcode.Subsystems.Gyroscope;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm;
 
@@ -18,7 +17,6 @@ public class TeleOperated extends OpMode {
     private Gyroscope gyroscope;
     private Drivetrain drivetrain;
     private Arm rotator;
-    private Extender extender;
 
 
     @Override
@@ -28,7 +26,6 @@ public class TeleOperated extends OpMode {
         drivetrain = new Drivetrain(hardwareMap);
         gyroscope = new Gyroscope(hardwareMap);
         rotator = new Arm(hardwareMap);
-        extender = new Extender(hardwareMap);
     }
 
     @Override
