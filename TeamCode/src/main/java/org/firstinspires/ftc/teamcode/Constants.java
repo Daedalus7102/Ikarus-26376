@@ -11,7 +11,6 @@ public class Constants {
     // useful for avoiding accidents while testing
     public static class Activation {
         public static boolean enableDrivetrain = true;
-        public static boolean enableArm = true;
         public static boolean enableExtender = false;
         public static boolean enableGyroscope = true;
     }
@@ -28,13 +27,6 @@ public class Constants {
                 logoFacingDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
         public static RevHubOrientationOnRobot.UsbFacingDirection
                 usbFacingDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
-    }
-
-    // These are standard servo position values (-1, 1) 0.06 is the optimal position for the base.
-    public static class Arm {
-        public static float baseArmPosition = 0.06f;
-        public static float basketArmPosition = 0.5f;
-
     }
 
     // Parameters for assigning controls for each action
