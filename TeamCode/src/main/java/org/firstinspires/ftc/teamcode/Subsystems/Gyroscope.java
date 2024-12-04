@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.teamcode.Constants;
 
+
 public class Gyroscope extends SubsystemBase {
     private BHI260IMU imu;
 
@@ -20,6 +21,7 @@ public class Gyroscope extends SubsystemBase {
         imu = hM.get(BHI260IMU.class, "imu");
         imu.initialize(parameters);
     }
+
 
     public double getHeading() {
         if (!Constants.Activation.enableGyroscope) { return 0; }

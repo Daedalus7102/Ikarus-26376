@@ -10,13 +10,14 @@ public class Constants {
 
     // useful for avoiding accidents while testing
     public static class Activation {
+
         public static boolean enableDrivetrain = false;
         public static boolean enableRotator = true;
         public static boolean enableExtender = true;
         public static boolean enableGyroscope = true; // Not sure why'd you turn this off but ok
     }
 
-    // Parameters for controlling driving mechanics
+    // Parameters for controlling driving mechanics (Speed, PIDs)
     public static class Drive {
         // These define the speed multipliers for regular driving and slow driving
         public static double slowSpeedMultiplier = 0.3;
@@ -54,7 +55,6 @@ public class Constants {
         // Mechanisms
         public static GamepadKeys.Button BASKET_MODE = GamepadKeys.Button.LEFT_BUMPER;
         public static GamepadKeys.Button SUCK_MODE = GamepadKeys.Button.RIGHT_BUMPER;
-
         public static GamepadKeys.Button OFFSET_UP = GamepadKeys.Button.DPAD_UP;
         public static GamepadKeys.Button OFFSET_DOWN = GamepadKeys.Button.DPAD_DOWN;
     }

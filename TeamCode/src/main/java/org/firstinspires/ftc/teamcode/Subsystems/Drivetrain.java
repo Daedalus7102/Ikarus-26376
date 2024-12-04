@@ -20,6 +20,7 @@ public class Drivetrain extends SubsystemBase {
         MotorEx backLeft = new MotorEx(hM, "backLeft", Motor.GoBILDA.RPM_312);
         MotorEx backRight = new MotorEx(hM, "backRight", Motor.GoBILDA.RPM_312);
 
+
         frontLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);

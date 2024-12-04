@@ -6,13 +6,15 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+
 import org.firstinspires.ftc.teamcode.Commands.ExtenderCommands.PartialExtendCommand;
 import org.firstinspires.ftc.teamcode.Commands.HighBasketGroup;
 import org.firstinspires.ftc.teamcode.Commands.ResetGroup;
-import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Extender;
 import org.firstinspires.ftc.teamcode.Subsystems.Gyroscope;
 import org.firstinspires.ftc.teamcode.Subsystems.Rotator;
+import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.Subsystems.Gyroscope;
 
 @TeleOp
 public class TeleOperated extends OpMode {
@@ -80,5 +82,6 @@ public class TeleOperated extends OpMode {
 
         // Very important line, do not remove
         com.arcrobotics.ftclib.command.CommandScheduler.getInstance().run();
+
     }
 }
