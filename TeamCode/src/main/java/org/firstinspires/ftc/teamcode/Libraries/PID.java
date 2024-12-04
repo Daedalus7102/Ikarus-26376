@@ -2,68 +2,99 @@ package org.firstinspires.ftc.teamcode.Libraries;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 /*
-Proportional Integral Derivative Controller w/ Low pass filter and anti-windup
+Proportional Integral Derivative Controller w/ Low pass filter, anti-windup, &
+other convenience features.
 Thanks to CTRL ALT FTC for the code reference. https://www.ctrlaltftc.com/the-pid-controller/
 */
 
 public class PID {
-    private final double Kp; // proportional term
-    private final double Ki; // integral term
-    private final double Kd; // derivative term
-    private final double maxIntegralSum; // maximum allowed accumulated value for the integral
-    private final double lowPassThreshold; // low pass filter threshold
+    private double Kp; // proportional term
+    private double Ki; // integral term
+    private double Kd; // derivative term
+    private double allowedError; // The maximum error allowed before the PID returns 0
+    private double offset;
 
     private double lastReference;
     private double lastError;
     private double integralSum;
     private double lastFilterEstimate;
     private double filterEstimate;
-    private final double allowedError;
+    private double reference;
+    private double currentPosition;
     private final ElapsedTime timer;
 
-    private Telemetry telemetry;
-
-    public PID(double Kp, double Ki, double Kd, double maxIntegralSum,
-               double lowPassThreshold, double currentPosition, double allowedError, Telemetry telemetry) {
+    public PID(double Kp, double Ki, double Kd, double allowedError) {
         this.Kp = Kp;
         this.Ki = Ki;
         this.Kd = Kd;
-        this.maxIntegralSum = maxIntegralSum;
-        this.lowPassThreshold = lowPassThreshold;
+
+        this.offset = 0 ;
         this.lastError = 0;
         this.integralSum = 0;
-        this.lastReference = currentPosition;
+        this.reference = 0;
+        this.lastReference = 0;
         this.filterEstimate = 0;
         this.lastFilterEstimate = 0;
+        this.currentPosition=0;
         this.allowedError = allowedError;
         this.timer = new ElapsedTime();
-        this.telemetry = telemetry;
     }
 
-    // This function is meant to run once per cycle in Teleop
-    public double tick(double reference, double currentPosition) {
+    public double getReference() {
+        return reference;
+    }
+
+    public void setReference(double reference) {
+        this.reference = reference;
+    }
+
+    public boolean isAtReference() {
+        return Math.abs(reference - currentPosition) < allowedError;
+    }
+
+    public void setAllowedError(double maxError) {
+        allowedError = maxError;
+    }
+
+    public void setKp(double Kp) {
+        this.Kp = Kp;
+    }
+    public void setKi(double Ki) {
+        this.Ki = Ki;
+    }
+    public void setKd(double Kd) {
+        this.Kd = Kd;
+    }
+
+    public void setPIDCoefficients(double kP, double Ki, double Kd) {
+        this.Kp = kP;
+        this.Ki = Ki;
+        this.Kd = Kd;
+    }
+
+    public double calculate(double currentPosition) {
+        this.currentPosition = currentPosition;
+
         double error = reference - currentPosition;
         double errorDifference = error - lastError;
 
-        telemetry.addData("current position", currentPosition);
-        telemetry.addData("reference", reference);
-        telemetry.addData("error", error);
-
-        filterEstimate = (lowPassThreshold*lastFilterEstimate) + (1-lowPassThreshold) * errorDifference;
+        // Filter derivative noise
+        double LOW_PASS_THRESHOLD = 0.8;
+        filterEstimate = (LOW_PASS_THRESHOLD *lastFilterEstimate) + (1- LOW_PASS_THRESHOLD) * errorDifference;
         lastFilterEstimate = filterEstimate;
 
         double derivative = filterEstimate / timer.seconds();
         integralSum += error * timer.seconds();
 
-        if (integralSum > maxIntegralSum) {
-            integralSum = maxIntegralSum;
+        // Maximum allowed accumulated value for the integral
+        double MAX_INTEGRAL_SUM = 0.25;
+        if (integralSum > MAX_INTEGRAL_SUM) {
+            integralSum = MAX_INTEGRAL_SUM;
         }
 
-        if (integralSum < -maxIntegralSum) {
-            integralSum = -maxIntegralSum;
+        if (integralSum < -MAX_INTEGRAL_SUM) {
+            integralSum = -MAX_INTEGRAL_SUM;
         }
 
         if (reference != lastReference) {
@@ -75,10 +106,9 @@ public class PID {
 
         timer.reset();
 
-        if (error < allowedError && error > -allowedError) {
+        if (Math.abs(error) < allowedError) {
             return 0;
-        } else {
-            return (Kp * error) + (Ki * integralSum) + (Kd * derivative);
         }
+        return Math.clamp(1, -1,(Kp * error) + (Ki * integralSum) + (Kd * derivative));
     }
 }

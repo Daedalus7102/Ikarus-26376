@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
@@ -7,24 +8,17 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Constants;
 
-public class Drivetrain {
-    private HardwareMap hardwareMap;
+public class Drivetrain extends SubsystemBase {
     private MecanumDrive drive;
     private double multiplier = Constants.Drive.regularSpeedMultiplier;
-
-    private MotorEx frontLeft;
-    private MotorEx frontRight;
-    private MotorEx backLeft;
-    private MotorEx backRight;
 
     public Drivetrain(HardwareMap hM) {
         if (!Constants.Activation.enableDrivetrain) { return; }
 
-        hardwareMap = hM;
-        frontLeft = new MotorEx(hardwareMap, "frontLeft", Motor.GoBILDA.RPM_312);
-        frontRight = new MotorEx(hardwareMap, "frontRight", Motor.GoBILDA.RPM_312);
-        backLeft = new MotorEx(hardwareMap, "backLeft", Motor.GoBILDA.RPM_312);
-        backRight = new MotorEx(hardwareMap, "backRight", Motor.GoBILDA.RPM_312);
+        MotorEx frontLeft = new MotorEx(hM, "frontLeft", Motor.GoBILDA.RPM_312);
+        MotorEx frontRight = new MotorEx(hM, "frontRight", Motor.GoBILDA.RPM_312);
+        MotorEx backLeft = new MotorEx(hM, "backLeft", Motor.GoBILDA.RPM_312);
+        MotorEx backRight = new MotorEx(hM, "backRight", Motor.GoBILDA.RPM_312);
 
         frontLeft.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
@@ -32,10 +26,8 @@ public class Drivetrain {
         backRight.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         drive = new MecanumDrive(frontLeft, frontRight, backLeft, backRight);
-
     }
 
-    // TODO: Fix inverted driving
     public void driveFieldOriented(double leftX, double leftY, double rightX, double heading) {
         if (!Constants.Activation.enableDrivetrain) { return; }
 

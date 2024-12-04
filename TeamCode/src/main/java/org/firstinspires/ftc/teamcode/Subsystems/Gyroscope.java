@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -7,17 +8,16 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.teamcode.Constants;
 
-public class Gyroscope {
-    private HardwareMap hardwareMap;
+public class Gyroscope extends SubsystemBase {
     private BHI260IMU imu;
+
     public Gyroscope(HardwareMap hM) {
         if (!Constants.Activation.enableGyroscope) { return; }
 
-        hardwareMap = hM;
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 Constants.Drive.logoFacingDirection,
                 Constants.Drive.usbFacingDirection));
-        imu = hardwareMap.get(BHI260IMU.class, "imu");
+        imu = hM.get(BHI260IMU.class, "imu");
         imu.initialize(parameters);
     }
 

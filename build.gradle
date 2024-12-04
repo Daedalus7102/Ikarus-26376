@@ -21,9 +21,11 @@ allprojects {
     repositories {
         mavenCentral()
         google()
+        jcenter()
     }
 }
 
 repositories {
     mavenCentral()
+    jcenter()
 }
