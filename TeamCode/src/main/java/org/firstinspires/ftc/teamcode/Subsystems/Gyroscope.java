@@ -10,29 +10,23 @@ import org.firstinspires.ftc.teamcode.Constants;
 
 
 public class Gyroscope extends SubsystemBase {
-    private BHI260IMU imu;
+    private final BHI260IMU imu;
 
     public Gyroscope(HardwareMap hM) {
-        if (!Constants.Activation.enableGyroscope) { return; }
-
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                Constants.Drive.logoFacingDirection,
-                Constants.Drive.usbFacingDirection));
+                Constants.Drive.LOGO_FACING_DIRECTION,
+                Constants.Drive.USB_FACING_DIRECTION));
         imu = hM.get(BHI260IMU.class, "imu");
         imu.initialize(parameters);
     }
 
 
     public double getHeading() {
-        if (!Constants.Activation.enableGyroscope) { return 0; }
-
         // In this case, the 'front' of the control hub is where the servo pins are
         return imu.getRobotYawPitchRollAngles().getYaw();
     }
 
     public void resetHeading() {
-        if (!Constants.Activation.enableGyroscope) { return; }
-
         imu.resetYaw();
     }
 }
