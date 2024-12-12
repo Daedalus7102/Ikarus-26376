@@ -5,35 +5,41 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Misc.PincerLUT;
 
 public class Pincer extends SubsystemBase {
     private final Servo pivotServo;
     private final CRServo suctionServo;
-    private double reference;
-    private double speed;
+    private final PincerLUT pincerLUT = new PincerLUT();
+    private final Extender extender;
+    private boolean useLUT = true;
 
     // Jeremy
-    public Pincer(HardwareMap hM) {
+    public Pincer(HardwareMap hM, Extender extender) {
         pivotServo = hM.get(Servo.class, "pincer_pivot");
         suctionServo = hM.get(CRServo.class, "pincer_suck");
-        reference = Constants.Pincer.INIT_ROTATION;
-        speed = 0;
+        this.extender = extender;
     }
 
+
     public void setPivotPosition(double reference) {
-        this.reference = reference;
+        this.useLUT = false;
+        pivotServo.setPosition(reference);
+    }
+
+    public void setSuckMode() {
+        this.useLUT = true;
     }
 
     public void setSuctionPower(double speed) {
-        this.speed = speed;
+        suctionServo.setPower(speed);
     }
 
     @Override
     public void periodic() {
-        pivotServo.setPosition(reference);
-        suctionServo.getPower();
+        //pivotServo.setPosition(configuration.rotation);
+        if (useLUT) {
+            pivotServo.setPosition(pincerLUT.calculate(extender.getExtenderReference()));
+        }
     }
-
-
 }

@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
@@ -55,14 +53,4 @@ public class Drivetrain extends SubsystemBase {
         }
         multiplier = Constants.Drive.REGULAR_SPEED_MULTIPLIER;
     }
-
-    @Override
-    public void periodic() {
-        TelemetryPacket telemetyr = new TelemetryPacket();
-        telemetyr.put("Speed multiplier ", multiplier);
-        telemetyr.put("Is tank", driveTank);
-
-        FtcDashboard.getInstance().sendTelemetryPacket(telemetyr);
-    }
-
 }

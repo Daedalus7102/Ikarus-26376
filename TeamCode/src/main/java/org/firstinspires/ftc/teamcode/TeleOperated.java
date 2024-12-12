@@ -1,100 +1,129 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
+import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Commands.Commands.DriveRobot;
 import org.firstinspires.ftc.teamcode.Commands.Groups.BasketGroup;
 import org.firstinspires.ftc.teamcode.Commands.Groups.ResetGroup;
 import org.firstinspires.ftc.teamcode.Commands.Groups.SuckModeGroup;
+import org.firstinspires.ftc.teamcode.Misc.TriggerButton;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
+import org.firstinspires.ftc.teamcode.Subsystems.Extender;
 import org.firstinspires.ftc.teamcode.Subsystems.Gyroscope;
 import org.firstinspires.ftc.teamcode.Subsystems.Pincer;
 
-// Robot code written (mostly) by Andres Perez from team Ikarus 26376
+import java.util.List;
+
+// Robot code written by Andres Perez from team Ikarus 26376 with the help of FTCLib
 // Thanks to all the FTClib contributors for creating this awesome library! :)
 
-@TeleOp
-public class TeleOperated extends OpMode {
-    private GamepadEx chassisGamepad;
-    private Gyroscope gyroscope;
+@TeleOp(name = "TeleOp")
+public class TeleOperated extends CommandOpMode {
     private Drivetrain drivetrain;
+    private Gyroscope gyroscope;
+    private Extender extender;
+    private Pincer pincer;
     private Arm arm;
-    private double lastTime = 0;
-    private FtcDashboard dash;
+
+    private GamepadEx chassisGamepad;
+    private GamepadEx mechanismsGamepad;
 
     @Override
-    public void init() {
+    public void initialize() {
 
-        // Subsystems
-        chassisGamepad = new GamepadEx(gamepad1);
-        GamepadEx mechanismsGamepad = new GamepadEx(gamepad2);
+
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
+
         drivetrain = new Drivetrain(hardwareMap);
         gyroscope = new Gyroscope(hardwareMap);
-        arm = new Arm(hardwareMap, telemetry);
-        Pincer pincer = new Pincer(hardwareMap);
-        ElapsedTime timer = new ElapsedTime();
-        dash = FtcDashboard.getInstance();
+        extender = new Extender(hardwareMap);
+        pincer = new Pincer(hardwareMap, extender);
+        arm = new Arm(hardwareMap);
 
-        // Chassis controls
-        GamepadButton resetHeadingButton = chassisGamepad.getGamepadButton(Constants.Controls.RESET_HEADING);
-        GamepadButton tankModeButton = chassisGamepad.getGamepadButton(Constants.Controls.ACTIVATE_TANK_MODE);
-        GamepadButton slowModeButton = chassisGamepad.getGamepadButton(Constants.Controls.ACTIVATE_SLOW_MODE);
+        chassisGamepad = new GamepadEx(gamepad1);
+        mechanismsGamepad = new GamepadEx(gamepad2);
 
-        // Chassis command assignment
-        resetHeadingButton.whenHeld(new InstantCommand(() -> gyroscope.resetHeading()));
-        tankModeButton.whenHeld(new InstantCommand(() -> drivetrain.setTankMode(true)));
-        tankModeButton.whenReleased(new InstantCommand(() -> drivetrain.setTankMode(false)));
-        slowModeButton.whenHeld(new InstantCommand(() -> drivetrain.setSlowMode(true)));
-        slowModeButton.whenReleased(new InstantCommand(() -> drivetrain.setSlowMode(false)));
+        // Chassis driving
+        schedule(new DriveRobot(drivetrain, gyroscope,
+                () -> chassisGamepad.getLeftX(),
+                () -> chassisGamepad.getLeftY(),
+                () -> chassisGamepad.getRightX()));
+
+        // pincer.setPivotPosition(Constants.Pincer.DISABLED_ROTATION);
+
+        TriggerButton tankModeTrigger = new TriggerButton(
+                () -> chassisGamepad.getTrigger(Constants.Controls.ACTIVATE_TANK_MODE));
+        TriggerButton slowModeTrigger = new TriggerButton(
+                () -> chassisGamepad.getTrigger(Constants.Controls.ACTIVATE_SLOW_MODE));
+
+        tankModeTrigger
+                .whenHeld(new InstantCommand(() -> drivetrain.setTankMode(true)))
+                .whenReleased(new InstantCommand(() -> drivetrain.setTankMode(false)));
+
+        slowModeTrigger
+                .whenHeld(new InstantCommand(() -> drivetrain.setSlowMode(true)))
+                .whenReleased(new InstantCommand(() -> drivetrain.setSlowMode(false)));
+
+        chassisGamepad.getGamepadButton(Constants.Controls.RESET_HEADING)
+                .whenHeld(new InstantCommand(() -> gyroscope.resetHeading()));
 
         // Mechanisms controls
-        GamepadButton riseHighBasketButton = mechanismsGamepad.getGamepadButton(Constants.Controls.BASKET_MODE);
-        GamepadButton suckModeButton = mechanismsGamepad.getGamepadButton(Constants.Controls.SUCK_MODE);
-        GamepadButton offsetUpButton = mechanismsGamepad.getGamepadButton(Constants.Controls.OFFSET_UP);
-        GamepadButton offsetDownButton = mechanismsGamepad.getGamepadButton(Constants.Controls.OFFSET_DOWN);
-        GamepadButton ejectPieceButton = mechanismsGamepad.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT);
-        GamepadButton suckPieceButton = mechanismsGamepad.getGamepadButton(GamepadKeys.Button.A);
 
-        // Mechanisms command assignment
-        riseHighBasketButton.whenHeld(new ConditionalCommand(new SequentialCommandGroup(),
-                new BasketGroup(arm), () -> mechanismsGamepad.getButton(Constants.Controls.SUCK_MODE)));
-        riseHighBasketButton.whenReleased(new ConditionalCommand(new SequentialCommandGroup(),
-                new ResetGroup(arm), () -> mechanismsGamepad.getButton(Constants.Controls.SUCK_MODE)));
+        TriggerButton basketModeTrigger = new TriggerButton(
+                () -> mechanismsGamepad.getTrigger(Constants.Controls.BASKET_MODE));
 
-        suckModeButton.whenHeld(new ConditionalCommand(new SequentialCommandGroup(),
-                new SuckModeGroup(arm), () -> mechanismsGamepad.getButton(Constants.Controls.BASKET_MODE)));
-        suckModeButton.whenReleased(new ConditionalCommand(new SequentialCommandGroup(),
-                new ResetGroup(arm), () -> mechanismsGamepad.getButton(Constants.Controls.BASKET_MODE)));
+        TriggerButton suckModeTrigger = new TriggerButton(
+                () -> mechanismsGamepad.getTrigger(Constants.Controls.SUCK_MODE));
 
-        offsetUpButton.and(suckModeButton).whileActiveContinuous(new InstantCommand(() -> arm.addOffset(20)));
-        offsetDownButton.and(suckModeButton).whileActiveContinuous(new InstantCommand(() -> arm.addOffset(-20)));
-    }
+        basketModeTrigger
+                .whenHeld(new BasketGroup(arm, extender, pincer, drivetrain))
+                .whenReleased(new ConditionalCommand(
+                        new SequentialCommandGroup(),
+                        new ResetGroup(arm, extender, pincer, drivetrain),
+                        suckModeTrigger::get
+                ));
 
-    @Override
-    public void loop() {
-//
-//        TelemetryPacket tele = new TelemetryPacket();
-//        tele.put("Uhh is this key pressed", chassisGamepad.getButton(GamepadKeys.Button.RIGHT_BUMPER));
-//        dash.sendTelemetryPacket(tele);
-//
+        suckModeTrigger
+                .whenHeld(new SuckModeGroup(arm, extender, pincer, drivetrain))
+                .whenReleased(new ConditionalCommand(
+                        new SequentialCommandGroup(),
+                        new ResetGroup(arm, extender, pincer, drivetrain),
+                        basketModeTrigger::get
+                ));
 
-        // Drives the robot
-        drivetrain.drive(chassisGamepad.getLeftX(),
-                    chassisGamepad.getLeftY(),
-                    chassisGamepad.getRightX(),
-                    gyroscope.getHeading());
+        mechanismsGamepad.getGamepadButton(Constants.Controls.OFFSET_UP)
+                .and(suckModeTrigger)
+                .whileActiveContinuous(new InstantCommand(() -> extender.addOffset(
+                        Constants.Extender.OFFSET_SPEED
+                )));
 
-        // Very important line, do not remove
-        com.arcrobotics.ftclib.command.CommandScheduler.getInstance().run();
+        mechanismsGamepad.getGamepadButton(Constants.Controls.OFFSET_DOWN)
+                .and(suckModeTrigger)
+                .whileActiveContinuous(new InstantCommand(() -> extender.addOffset(
+                        -Constants.Extender.OFFSET_SPEED
+                )));
+
+        mechanismsGamepad.getGamepadButton(Constants.Controls.SPIT_PIECE)
+                .whenHeld(new InstantCommand(() -> pincer.setSuctionPower(1)))
+                .whenReleased(new InstantCommand(() -> pincer.setSuctionPower(0)));
+
+        mechanismsGamepad.getGamepadButton(Constants.Controls.SUCK_PIECE)
+                .whenHeld(new InstantCommand(() -> pincer.setSuctionPower(-1)))
+                .whenReleased(new InstantCommand(() -> pincer.setSuctionPower(0)));
+
+        mechanismsGamepad.getGamepadButton(Constants.Controls.RESET_ENCODER)
+                .whenHeld(new InstantCommand(() -> extender.resetExtenderEncoder()));
     }
 }
 

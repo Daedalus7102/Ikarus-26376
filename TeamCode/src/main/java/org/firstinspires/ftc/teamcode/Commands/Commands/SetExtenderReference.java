@@ -2,23 +2,24 @@ package org.firstinspires.ftc.teamcode.Commands.Commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Subsystems.Arm;
+import org.firstinspires.ftc.teamcode.Subsystems.Extender;
 
 public class SetExtenderReference extends CommandBase {
-    private final Arm arm;
-    public SetExtenderReference(Arm arm, double reference) {
-        this.arm = arm;
-        addRequirements(arm);
+    private final Extender extender;
+    private final double reference;
+    public SetExtenderReference(Extender extender, double reference) {
+        this.extender = extender;
+        this.reference = reference;
+        addRequirements(extender);
     }
 
     @Override
     public void initialize() {
-        arm.setExtenderReference(Constants.Extender.MAXIMUM_EXTENSION);
+        extender.setExtenderReference(reference);
     }
 
     @Override
     public boolean isFinished() {
-        return arm.extenderIsAtReference();
+        return extender.extenderIsAtReference();
     }
 }
