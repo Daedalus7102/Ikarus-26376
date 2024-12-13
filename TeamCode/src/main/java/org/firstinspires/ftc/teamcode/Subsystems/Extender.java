@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Configuration;
 import org.firstinspires.ftc.teamcode.Misc.MotorUtils;
 
 public class Extender extends SubsystemBase {
@@ -21,8 +21,8 @@ public class Extender extends SubsystemBase {
     private double extenderReference = 0;
     private double extenderMotorPosition;
 
-    private final double MAXIMUM_EXTENSION = Constants.Extender.MAXIMUM_BASKET_EXTENSION;
-    private final double MINIMUM_EXTENSION = Constants.Extender.MINIMUM_EXTENSION;
+    private final double MAXIMUM_EXTENSION = Configuration.Extender.HIGH_BASKET_EXTENSION;
+    private final double MINIMUM_EXTENSION = Configuration.Extender.MINIMUM_EXTENSION;
 
     public Extender(HardwareMap hardwareMap) {
         extenderMotor = hardwareMap.get(DcMotorEx.class, "extender");
@@ -49,7 +49,7 @@ public class Extender extends SubsystemBase {
     public void addOffset(double x) {
         if (extenderReference + x + extenderOffset < MINIMUM_EXTENSION) {
             return;
-        } else if (extenderReference + x + extenderOffset > Constants.Extender.MAXIMUM_SUCK_EXTENSION) {
+        } else if (extenderReference + x + extenderOffset > Configuration.Extender.MAXIMUM_SUCK_EXTENSION) {
             return;
         }
 
@@ -92,7 +92,7 @@ public class Extender extends SubsystemBase {
         extenderMotor.setPower(
                 MotorUtils.safePID(
                         extenderPID.calculate(extenderMotorPosition),
-                        Constants.Extender.MAXIMUM_MOTOR_OUTPUT
+                        Configuration.Extender.MAXIMUM_MOTOR_OUTPUT
                 ));
     }
 }

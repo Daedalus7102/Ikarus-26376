@@ -4,16 +4,15 @@ import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Arm;
 
-public class RotateArmDown extends CommandBase {
+public class RotateLowBasket extends CommandBase {
     private final Arm arm;
-    public RotateArmDown(Arm arm) {
+    public RotateLowBasket(Arm arm) {
         this.arm = arm;
-        addRequirements(arm);
     }
 
     @Override
     public void initialize() {
-        arm.lower();
+        arm.rotateLowBasket();
     }
 
     @Override

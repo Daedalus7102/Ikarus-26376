@@ -5,7 +5,8 @@ import com.arcrobotics.ftclib.command.ScheduleCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 
 import org.firstinspires.ftc.teamcode.Commands.Commands.RetractExtender;
-import org.firstinspires.ftc.teamcode.Commands.Commands.RotateArmDown;
+import org.firstinspires.ftc.teamcode.Commands.Commands.RotateDown;
+import org.firstinspires.ftc.teamcode.Configuration;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Extender;
@@ -17,13 +18,18 @@ public class ResetGroup extends SequentialCommandGroup {
         addCommands(
                 new ScheduleCommand(
                         new InstantCommand(
-                                pincer::setSuckMode
+                                () -> pincer.setPivotPosition(Configuration.Pincer.DEFAULT_ROTATION)
                 )),
                 new RetractExtender(extender),
-                new RotateArmDown(arm),
+                new RotateDown(arm),
                 new ScheduleCommand(
                         new InstantCommand(
                                 () -> drivetrain.setSlowMode(true)
+                        )
+                ),
+                new ScheduleCommand(
+                        new InstantCommand(
+                                () -> drivetrain.setSlowMode(false)
                         )
                 )
         );

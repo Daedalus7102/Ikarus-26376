@@ -6,9 +6,9 @@ import com.arcrobotics.ftclib.command.ScheduleCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 
 import org.firstinspires.ftc.teamcode.Commands.Commands.RetractExtender;
-import org.firstinspires.ftc.teamcode.Commands.Commands.RotateArmDown;
+import org.firstinspires.ftc.teamcode.Commands.Commands.RotateDown;
 import org.firstinspires.ftc.teamcode.Commands.Commands.SetExtenderReference;
-import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Configuration;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm;
 import org.firstinspires.ftc.teamcode.Subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.Subsystems.Extender;
@@ -30,9 +30,15 @@ public class SuckModeGroup extends SequentialCommandGroup {
                 new ConditionalCommand(
                         new RetractExtender(extender),
                         new SequentialCommandGroup(
-                                new SetExtenderReference(extender, Constants.Extender.MINIMUM_EXTENSION),
-                                new RotateArmDown(arm)),
-                () -> arm.getArmReference() == Constants.Arm.MINIMUM_ROTATION));
+                                new SetExtenderReference(extender, Configuration.Extender.MINIMUM_EXTENSION),
+                                new RotateDown(arm)),
+                () -> arm.getArmReference() == Configuration.Arm.MINIMUM_ROTATION),
+                new ScheduleCommand(
+                        new InstantCommand(
+                             () -> drivetrain.setSlowMode(true)
+                        )
+                )
+        );
 
         addRequirements(arm);
     }

@@ -6,11 +6,11 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Configuration;
 
 public class Drivetrain extends SubsystemBase {
     private final MecanumDrive drive;
-    private double multiplier = Constants.Drive.REGULAR_SPEED_MULTIPLIER;
+    private double multiplier = Configuration.Drive.REGULAR_SPEED_MULTIPLIER;
     private boolean driveTank = false;
 
     public Drivetrain(HardwareMap hM) {
@@ -48,9 +48,9 @@ public class Drivetrain extends SubsystemBase {
 
     public void setSlowMode(boolean option) {
         if (option) {
-            multiplier = Constants.Drive.SLOW_SPEED_MULTIPLIER;
+            multiplier = Configuration.Drive.SLOW_SPEED_MULTIPLIER;
             return;
         }
-        multiplier = Constants.Drive.REGULAR_SPEED_MULTIPLIER;
+        multiplier = Configuration.Drive.REGULAR_SPEED_MULTIPLIER;
     }
 }

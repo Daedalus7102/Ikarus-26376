@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.ConditionalCommand;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Commands.Commands.DriveRobot;
-import org.firstinspires.ftc.teamcode.Commands.Groups.BasketGroup;
+import org.firstinspires.ftc.teamcode.Commands.Groups.HighBasketGroup;
+import org.firstinspires.ftc.teamcode.Commands.Groups.LowBasketGroup;
 import org.firstinspires.ftc.teamcode.Commands.Groups.ResetGroup;
 import org.firstinspires.ftc.teamcode.Commands.Groups.SuckModeGroup;
 import org.firstinspires.ftc.teamcode.Misc.TriggerButton;
@@ -38,6 +38,7 @@ public class TeleOperated extends CommandOpMode {
     @Override
     public void initialize() {
 
+        CommandScheduler.getInstance().reset();
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
@@ -63,9 +64,9 @@ public class TeleOperated extends CommandOpMode {
         // pincer.setPivotPosition(Constants.Pincer.DISABLED_ROTATION);
 
         TriggerButton tankModeTrigger = new TriggerButton(
-                () -> chassisGamepad.getTrigger(Constants.Controls.ACTIVATE_TANK_MODE));
+                () -> chassisGamepad.getTrigger(Configuration.Controls.ACTIVATE_TANK_MODE));
         TriggerButton slowModeTrigger = new TriggerButton(
-                () -> chassisGamepad.getTrigger(Constants.Controls.ACTIVATE_SLOW_MODE));
+                () -> chassisGamepad.getTrigger(Configuration.Controls.ACTIVATE_SLOW_MODE));
 
         tankModeTrigger
                 .whenHeld(new InstantCommand(() -> drivetrain.setTankMode(true)))
@@ -75,54 +76,58 @@ public class TeleOperated extends CommandOpMode {
                 .whenHeld(new InstantCommand(() -> drivetrain.setSlowMode(true)))
                 .whenReleased(new InstantCommand(() -> drivetrain.setSlowMode(false)));
 
-        chassisGamepad.getGamepadButton(Constants.Controls.RESET_HEADING)
+        chassisGamepad.getGamepadButton(Configuration.Controls.RESET_HEADING)
                 .whenHeld(new InstantCommand(() -> gyroscope.resetHeading()));
 
         // Mechanisms controls
 
         TriggerButton basketModeTrigger = new TriggerButton(
-                () -> mechanismsGamepad.getTrigger(Constants.Controls.BASKET_MODE));
+                () -> mechanismsGamepad.getTrigger(Configuration.Controls.HIGH_BASKET_TRIGGER));
 
         TriggerButton suckModeTrigger = new TriggerButton(
-                () -> mechanismsGamepad.getTrigger(Constants.Controls.SUCK_MODE));
+                () -> mechanismsGamepad.getTrigger(Configuration.Controls.SUCK_MODE_TRIGGER));
 
         basketModeTrigger
-                .whenHeld(new BasketGroup(arm, extender, pincer, drivetrain))
-                .whenReleased(new ConditionalCommand(
-                        new SequentialCommandGroup(),
-                        new ResetGroup(arm, extender, pincer, drivetrain),
-                        suckModeTrigger::get
-                ));
+                .whenHeld(new HighBasketGroup(arm, extender, pincer, drivetrain))
+                .whenReleased(new ResetGroup(arm, extender, pincer, drivetrain));
 
         suckModeTrigger
                 .whenHeld(new SuckModeGroup(arm, extender, pincer, drivetrain))
-                .whenReleased(new ConditionalCommand(
-                        new SequentialCommandGroup(),
-                        new ResetGroup(arm, extender, pincer, drivetrain),
-                        basketModeTrigger::get
-                ));
+                .whenReleased(new ResetGroup(arm, extender, pincer, drivetrain));
 
-        mechanismsGamepad.getGamepadButton(Constants.Controls.OFFSET_UP)
+        mechanismsGamepad.getGamepadButton(Configuration.Controls.LOW_BASKET_BUTTON)
+                .whenHeld(new LowBasketGroup(arm, extender, pincer, drivetrain))
+                .whenReleased(new ResetGroup(arm, extender, pincer, drivetrain));
+
+        mechanismsGamepad.getGamepadButton(Configuration.Controls.EXTENDER_OFFSET_UP)
                 .and(suckModeTrigger)
                 .whileActiveContinuous(new InstantCommand(() -> extender.addOffset(
-                        Constants.Extender.OFFSET_SPEED
+                        Configuration.Extender.OFFSET_ADD_SPEED
                 )));
 
-        mechanismsGamepad.getGamepadButton(Constants.Controls.OFFSET_DOWN)
+        mechanismsGamepad.getGamepadButton(Configuration.Controls.EXTENDER_OFFSET_DOWN)
                 .and(suckModeTrigger)
                 .whileActiveContinuous(new InstantCommand(() -> extender.addOffset(
-                        -Constants.Extender.OFFSET_SPEED
+                        -Configuration.Extender.OFFSET_ADD_SPEED
                 )));
 
-        mechanismsGamepad.getGamepadButton(Constants.Controls.SPIT_PIECE)
+        mechanismsGamepad.getGamepadButton(Configuration.Controls.PINCER_OFFSET_UP)
+                .and(suckModeTrigger)
+                .whileActiveContinuous(new InstantCommand(() -> pincer.addOffset(0.001)));
+
+        mechanismsGamepad.getGamepadButton(Configuration.Controls.PINCER_OFFSET_DOWN)
+                .and(suckModeTrigger)
+                .whileActiveContinuous(new InstantCommand(() -> pincer.addOffset(-0.001)));
+
+        mechanismsGamepad.getGamepadButton(Configuration.Controls.SPIT_PIECE)
                 .whenHeld(new InstantCommand(() -> pincer.setSuctionPower(1)))
                 .whenReleased(new InstantCommand(() -> pincer.setSuctionPower(0)));
 
-        mechanismsGamepad.getGamepadButton(Constants.Controls.SUCK_PIECE)
+        mechanismsGamepad.getGamepadButton(Configuration.Controls.SUCK_PIECE)
                 .whenHeld(new InstantCommand(() -> pincer.setSuctionPower(-1)))
                 .whenReleased(new InstantCommand(() -> pincer.setSuctionPower(0)));
 
-        mechanismsGamepad.getGamepadButton(Constants.Controls.RESET_ENCODER)
+        mechanismsGamepad.getGamepadButton(Configuration.Controls.RESET_ENCODER)
                 .whenHeld(new InstantCommand(() -> extender.resetExtenderEncoder()));
     }
 }

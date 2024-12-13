@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -10,7 +10,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Configuration;
 import org.firstinspires.ftc.teamcode.Misc.MotorUtils;
 
 public class Arm extends SubsystemBase {
@@ -20,8 +21,9 @@ public class Arm extends SubsystemBase {
     private boolean isLowering = false;
     private double armMotorPosition;
 
+    private MultipleTelemetry telemetry;
 
-    public Arm(HardwareMap hM) {
+    public Arm(HardwareMap hM, Telemetry telemetry) {
         armMotor1 = hM.get(DcMotorEx.class, "rotator_1");
         armMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -42,7 +44,7 @@ public class Arm extends SubsystemBase {
         armMotor2.setPower(output);
     }
 
-    @Config
+    @com.acmerobotics.dashboard.config.Config
     private static class riseParams {
         public static double kP = 0.015;
         public static double kI = 0.1;
@@ -50,12 +52,20 @@ public class Arm extends SubsystemBase {
         public static double allowedError = 10;
     }
 
-    public void riseToBasket() {
+    public void rotateHighBasket() {
         isLowering = false;
         armPID.reset();
         armPID.setPID(riseParams.kP,riseParams.kI,riseParams.kD);
         armPID.setTolerance(riseParams.allowedError);
-        armPID.setSetPoint(Constants.Arm.MAXIMUM_ROTATION);
+        armPID.setSetPoint(Configuration.Arm.HIGH_BASKET_ROTATION);
+    }
+
+    public void rotateLowBasket() {
+        isLowering = false;
+        armPID.reset();
+        armPID.setPID(riseParams.kP,riseParams.kI,riseParams.kD);
+        armPID.setTolerance(riseParams.allowedError);
+        armPID.setSetPoint(Configuration.Arm.LOW_BASKET_ROTATION);
     }
 
     public void lower() {
@@ -63,8 +73,8 @@ public class Arm extends SubsystemBase {
         armPID.reset();
         // we do a little bit of hacky PID black magic so it lowers smoothly :)
         armPID.setPID(0.0015,0,0);
-        armPID.setTolerance(Constants.Arm.MAXIMUM_ROTATION - 30);
-        armPID.setSetPoint(Constants.Arm.MINIMUM_ROTATION);
+        armPID.setTolerance(Configuration.Arm.HIGH_BASKET_ROTATION - 30);
+        armPID.setSetPoint(Configuration.Arm.MINIMUM_ROTATION);
     }
 
     public boolean armIsAtReference() {
@@ -79,7 +89,7 @@ public class Arm extends SubsystemBase {
     public void periodic() {
         armMotorPosition = armMotor1.getCurrentPosition();
         double PIDResult = MotorUtils.safePID(
-                armPID.calculate(armMotorPosition), Constants.Arm.MAXIMUM_MOTOR_OUTPUT);
+                armPID.calculate(armMotorPosition), Configuration.Arm.MAXIMUM_MOTOR_OUTPUT);
 
         TelemetryPacket pack = new TelemetryPacket();
 

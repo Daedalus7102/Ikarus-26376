@@ -6,7 +6,7 @@ import com.arcrobotics.ftclib.command.ScheduleCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
-import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Configuration;
 import org.firstinspires.ftc.teamcode.Subsystems.Extender;
 
 public class RetractExtender extends ParallelRaceGroup {
@@ -18,6 +18,6 @@ public class RetractExtender extends ParallelRaceGroup {
                                 new InstantCommand(extender::resetExtenderEncoder, extender)
                         )
                 ),
-                new SetExtenderReference(extender, Constants.Extender.MINIMUM_EXTENSION));
+                new SetExtenderReference(extender, Configuration.Extender.MINIMUM_EXTENSION));
     }
 }
