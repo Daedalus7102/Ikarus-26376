@@ -24,11 +24,6 @@ public class ResetGroup extends SequentialCommandGroup {
                 new RotateDown(arm),
                 new ScheduleCommand(
                         new InstantCommand(
-                                () -> drivetrain.setSlowMode(true)
-                        )
-                ),
-                new ScheduleCommand(
-                        new InstantCommand(
                                 () -> drivetrain.setSlowMode(false)
                         )
                 )

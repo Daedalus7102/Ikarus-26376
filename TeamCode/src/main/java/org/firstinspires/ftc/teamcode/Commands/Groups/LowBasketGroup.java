@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ScheduleCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.Commands.Commands.RetractExtender;
 import org.firstinspires.ftc.teamcode.Commands.Commands.RotateLowBasket;
@@ -33,6 +34,11 @@ public class LowBasketGroup extends SequentialCommandGroup {
                                 new RotateLowBasket(arm),
                                 new SetExtenderReference(extender, Configuration.Extender.LOW_BASKET_EXTENSION)
                         ),
-                        () -> arm.getArmReference() == Configuration.Arm.LOW_BASKET_ROTATION));
+                        () -> arm.getArmReference() == Configuration.Arm.LOW_BASKET_ROTATION),
+                        new SequentialCommandGroup(
+                            new WaitCommand(300),
+                            new SetExtenderReference(extender, Configuration.Extender.HIGH_BASKET_EXTENSION)
+                        )
+        );
     }
 }

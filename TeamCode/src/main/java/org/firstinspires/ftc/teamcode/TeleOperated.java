@@ -50,7 +50,7 @@ public class TeleOperated extends CommandOpMode {
         gyroscope = new Gyroscope(hardwareMap);
         extender = new Extender(hardwareMap);
         pincer = new Pincer(hardwareMap, extender);
-        arm = new Arm(hardwareMap);
+        arm = new Arm(hardwareMap, telemetry);
 
         chassisGamepad = new GamepadEx(gamepad1);
         mechanismsGamepad = new GamepadEx(gamepad2);
@@ -71,10 +71,6 @@ public class TeleOperated extends CommandOpMode {
         tankModeTrigger
                 .whenHeld(new InstantCommand(() -> drivetrain.setTankMode(true)))
                 .whenReleased(new InstantCommand(() -> drivetrain.setTankMode(false)));
-
-        slowModeTrigger
-                .whenHeld(new InstantCommand(() -> drivetrain.setSlowMode(true)))
-                .whenReleased(new InstantCommand(() -> drivetrain.setSlowMode(false)));
 
         chassisGamepad.getGamepadButton(Configuration.Controls.RESET_HEADING)
                 .whenHeld(new InstantCommand(() -> gyroscope.resetHeading()));

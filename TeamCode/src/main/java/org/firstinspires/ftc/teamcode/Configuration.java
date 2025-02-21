@@ -33,7 +33,7 @@ public class Configuration {
         public static  double MINIMUM_EXTENSION = 0;
 
         // Maximum speed for the extender motor
-        public static  double MAXIMUM_MOTOR_OUTPUT = 1;
+        public static  double MAXIMUM_MOTOR_OUTPUT = 0.85;
 
         // How many encoder ticks of offset to add per cycle in suck mode
         public static  double OFFSET_ADD_SPEED = 15;
@@ -48,7 +48,7 @@ public class Configuration {
         public static double MINIMUM_ROTATION = 0;
 
         // Maximum speed of the arm
-        public static double MAXIMUM_MOTOR_OUTPUT = 0.75;
+        public static double MAXIMUM_MOTOR_OUTPUT = 0.7;
     }
 
     @Config

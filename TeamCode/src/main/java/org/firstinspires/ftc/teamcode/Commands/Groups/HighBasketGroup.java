@@ -4,6 +4,8 @@ import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ScheduleCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
+
 import org.firstinspires.ftc.teamcode.Commands.Commands.RetractExtender;
 import org.firstinspires.ftc.teamcode.Commands.Commands.RotateHighBasket;
 import org.firstinspires.ftc.teamcode.Commands.Commands.SetExtenderReference;
@@ -27,13 +29,17 @@ public class HighBasketGroup extends SequentialCommandGroup {
                                 () -> pincer.setPivotPosition(Configuration.Pincer.DEFAULT_ROTATION))
                 ),
                 new ConditionalCommand(
-                    new SetExtenderReference(extender, Configuration.Extender.HIGH_BASKET_EXTENSION),
+                    new SequentialCommandGroup(),
                     new SequentialCommandGroup(
                             new RetractExtender(extender),
-                            new RotateHighBasket(arm),
-                            new SetExtenderReference(extender, Configuration.Extender.HIGH_BASKET_EXTENSION)
+                            new RotateHighBasket(arm)
                 ),
-                    () -> arm.getArmReference() == Configuration.Arm.HIGH_BASKET_ROTATION));
+                    () -> arm.getArmReference() == Configuration.Arm.HIGH_BASKET_ROTATION),
+                new SequentialCommandGroup(
+                        new WaitCommand(300),
+                        new SetExtenderReference(extender, Configuration.Extender.HIGH_BASKET_EXTENSION)
+                )
+        );
 
         // testing
         // addCommands(new RotateArmBasket(arm));
